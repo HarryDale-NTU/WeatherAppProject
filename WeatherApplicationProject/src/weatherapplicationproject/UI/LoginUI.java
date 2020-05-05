@@ -5,6 +5,8 @@
  */
 package weatherapplicationproject.UI;
 
+import weatherapplicationproject.User;
+
 /**
  *
  * @author Daleh
@@ -98,6 +100,8 @@ public class LoginUI extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        txtUser.getAccessibleContext().setAccessibleName("");
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -106,11 +110,7 @@ public class LoginUI extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUserActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-        String password = txtPass.getText();//Store Password that is displayed as ***
-        String username = txtUser.getText();//Store User Entry
-        String path = "Users.txt";//File that usernames and password is stored
-
-        UserVerify(username, password, path);    // TODO add your handling code here:
+        User.mode = "Login"; 
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
@@ -157,7 +157,7 @@ public class LoginUI extends javax.swing.JFrame {
     private javax.swing.JButton btnLogin;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JPasswordField txtPass;
-    private javax.swing.JTextField txtUser;
+    public javax.swing.JPasswordField txtPass;
+    public javax.swing.JTextField txtUser;
     // End of variables declaration//GEN-END:variables
 }

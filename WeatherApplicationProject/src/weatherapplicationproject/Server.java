@@ -7,6 +7,9 @@ package weatherapplicationproject;
 
 import java.io.*;
 import java.net.*;
+import java.util.Scanner;
+import javax.swing.JOptionPane;
+import static weatherapplicationproject.Server.serverScreen;
 import weatherapplicationproject.UI.ServerUI;
 
 /**
@@ -15,73 +18,160 @@ import weatherapplicationproject.UI.ServerUI;
  */
 public class Server {
     
-    static ServerUI serverScreen = new ServerUI(); 
+    static Socket s = null;
+    public static ServerUI serverScreen = new ServerUI(); 
     
-    public class createConnections{
-        try 
-            {                    
-                // Make Socket Object. 
-                s = _ss.accept();                   
-                System.out.println("New Connection recognised. Socket details:  " + s);                   
-                // obtain input and out streams.
-                DataInputStream dis  = new DataInputStream( s.getInputStream()); 
-                DataOutputStream dos = new DataOutputStream(s.getOutputStream());                   
-                System.out.println("New Connection data I/O streams defined.");  
-                // Create a new server thread to handle client updates using the ClientHandler. 
-                clientHandler t = new clientHandler(s, dis, dos);  
-               // allWeatherStations.add(t);
-                System.out.println("New Connection assigned new server thread and added to vector.");                 
-                // Start this new threads execution.                   
-                t.start();        
-                
-                
-                try{
-            ss = new ServerSocket(1201); //server start at 1201 port
-            
-            
-            while(true)
-            {
-                s = ss.accept();// now server will accept the connection
-                //serverScreen.areaServer.setText(areaServer.getText().trim() +"Server open on port 1201".trim());
-                //areaServer.setText(areaServer.getText().trim() +"\nNew client ("+(ID+1)+") request received : "+ s);
-                
-                DataInputStream din  = new DataInputStream( s.getInputStream()); 
-                DataOutputStream dout = new DataOutputStream(s.getOutputStream());
-                clientHandler newClient = new clientHandler(s,ID);
-                Thread t = new Thread(newClient);
-                
-                //areaServer.setText(areaServer.getText().trim() +"\nAdding new client to list\n");
-                
-                //clientList.add(newClient);
-                t.start();
-            }
-        //display a Server confirmation effort
-        }catch(IOException e){
-        }   
+    public static void main(String[] args) throws IOException
+    {
+       serverScreen.setVisible(true); 
+              
+       ServerSocket ss = new ServerSocket(5050);
+         
+       createConnections(ss);
 
-        try{
-            DatagramSocket server = new DatagramSocket(1201);
-            byte[] data = new byte[1024];
-            DatagramPacket receivedPacket = new DatagramPacket(data,data.length);
-            server.receive (receivedPacket);
-            data = receivedPacket.getData();
-            
-            
-        }
-        catch (Exception e){       
-        }
-            } 
     }
-    public class clientHandler{
-        
-    }
-    public class weatherStationHandler{
-        
-    }
-            
-            
     
-    
+    static void createConnections(ServerSocket ss)throws IOException
+    {   
+         try
+         {
+            s = ss.accept();// now server will accept the connection
+            DataInputStream din = new DataInputStream(s.getInputStream());
+            DataOutputStream dout = new DataOutputStream(s.getOutputStream());
+            clientHandler newClient = new clientHandler(s,din,dout);
+            Thread t = new Thread(newClient);
+            t.start();
+            
+            }catch(IOException e)
+            {
+               JOptionPane.showMessageDialog(null, "Error"); //error handling
+            }                       
+        }
 }
+
+class clientHandler extends Thread
+{
+    static String clientMode = ""; 
+    final DataInputStream din; 
+    final DataOutputStream dout; 
+    final Socket s;
+    private static Scanner x;
+    
+    static String username = "";
+    static String password  = "";
+    
+    
+    
+    public clientHandler(Socket s, DataInputStream din, DataOutputStream dout)
+    {
+        this.s = s; 
+        this.din = din; 
+        this.dout = dout;
+    }
+    
+    @Override
+    public void run()
+    {
+        do
+        {
+            try
+            {
+                clientMode = din.readUTF();
+            }
+            catch (IOException e)
+            {
+                
+            }
+        }while(clientMode.equals(""));  
+        
+        while (clientMode.equals("User"))
+            {
+                try{
+                userLoginVerify(this.s, this.din, this.dout);
+                }
+                catch (IOException e)
+                {
+                    
+                }
+            }
+//        while("User".equals(clientMode))
+//        {
+//            userLoginVerify(this.s, this.din, this.dout);
+//        }
+    }
+    
+    static void clientCheck(DataInputStream din) throws IOException 
+     {                              
+                                      
+     }
+            
+    static void userLoginVerify(Socket s, DataInputStream din, DataOutputStream dout)throws IOException 
+    {
+        boolean isLocated = false; //Set check for located file as false
+        String userTemp = "";//Declared empty Variable for password
+        String passTemp = "";//Declared empty Variable for password
+        String userFile = "Users.txt";
+        String connection     = "Failed";
+
+        String mode = din.readUTF();
+        
+        if (mode.equals("Login"))
+        {
+            try
+            {
+                username = din.readUTF();
+                password = din.readUTF();
+
+                x = new Scanner(new File(userFile));
+                x.useDelimiter("[,\n]");//remove , from the string inside file
+                while (x.hasNext() && !isLocated) 
+                {
+                    userTemp = x.next();
+                    passTemp = x.next();
+
+                    if (userTemp.trim().equals(username.trim()) && passTemp.trim().equals(password.trim())) 
+                    {
+                        isLocated = true;
+                        connection = "Success";
+                        serverScreen.areaUsers.setText(serverScreen.areaUsers.getText().trim() +username.trim());
+                    }
+                }
+                   dout.writeUTF(connection);
+                   mode = "";
+            } 
+            catch (Exception e) 
+            {       
+                JOptionPane.showMessageDialog(null, "Error 1");//Catch any error and display to user
+            }
+        }
+    }
+   
+    static void clientUser()
+    {
+        
+        
+        
+        
+        
+    }
+    
+    static void clientWeatherStation(DataInputStream din, DataOutputStream dout)
+    {   
+        
+        
+        
+        
+        
+        
+    }
+    
+   
+    
+
+}
+            
+    
+            
+
 
 

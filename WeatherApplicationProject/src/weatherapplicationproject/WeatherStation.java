@@ -5,6 +5,7 @@
  */
 package weatherapplicationproject;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Random;
 
@@ -32,10 +33,23 @@ public class WeatherStation {
         windSpeed = random.nextFloat();
         windDir = windDirList[random.nextInt(7)];
     }
+        
+//    static void SendValues() throws IOException
+//     {
+//        dout.writeUTF(Id);
+//         
+//        dout.writeUTF(Float.toString(posLattitude));
+//        dout.writeUTF(Float.toString(posLongtitude));
+//        dout.writeUTF(Float.toString(airTemp));
+//        dout.writeUTF(Float.toString(windSpeed));
+//        dout.writeUTF(windDir);                
+//     } 
+    
     
     public static void main(String[] args) throws IOException 
     {
         
     }
+    
     
 }
