@@ -32,32 +32,42 @@ public class User {
    private static Socket s;
    public static String mode = "";
    
+   
+   
+    static String selectedStation = null; 
+    static String selectedLattitude;
+    static String selectedLongtitude; 
+    static String selectedWindDirection;
+    static String selectedWindSpeed;
+    static String selectedTemp;
+   
+   
     public static void main(String[] args) throws IOException  
     {
         try
         {
-            
             loginScreen.setVisible(true);
-
             
-
-            while(true)
+            while (true)
             {
-                if(mode.equals("Login"))
+            System.out.print(mode + "\n");
+            if(mode.equals("Login"))
+            {
+                attemptConnection();
+                attemptLogin();
+            }
+            if(mode.equals("Download"))
                 {
-                    attemptConnection();
-                    attemptLogin();
+                    downloadWeatherStation();            
                 }
             }
-        }
             
-                    
+        }
+                            
         catch(Exception e)
         {
           JOptionPane.showMessageDialog(null, "Error 2");             
-        } 
-        
-
+        }    
     }
     
    static void attemptConnection()
@@ -85,20 +95,29 @@ public class User {
            username = loginScreen.txtUser.getText();
            password = loginScreen.txtPass.getText();
            
-           
            dout.writeUTF(username);
            dout.writeUTF(password);
            
-           //response = din.readUTF();
-           clientScreen.setVisible(true);
-           loginScreen.setVisible(false);
-           mode = "";
-           
-           
+           response = din.readUTF(); 
            
            if (response.equals("Success"))
            {
+               clientScreen.lblUser.setText(username);
+               clientScreen.setVisible(true);
+               loginScreen.setVisible(false);
+               
                JOptionPane.showMessageDialog(null, "Win");
+
+                 int amountOfConnectedStations = 0;
+                 amountOfConnectedStations =  Integer.valueOf(din.readUTF());                                                
+                 for(int i = 0; i < amountOfConnectedStations; i++)
+                 {                 
+                      clientScreen.cmbStationSelect.add(din.readUTF());
+                 }
+               
+               mode = "";
+               
+               
            }
        }
        catch(IOException e)
@@ -108,19 +127,44 @@ public class User {
        
        }
       
-//   static void downloadWeatherStation()
-//   {
-//       try 
-//       {
-//           
-//       }
-//       catch(IOException e)
-//       {
-//           
-//       }
-//       
-//       
-//   }
+   static void downloadWeatherStation()
+   {
+       try 
+       {
+           dout.writeUTF("Download");
+           
+           selectedStation =  clientScreen.cmbStationSelect.getItem(clientScreen.cmbStationSelect.getSelectedIndex());
+           dout.writeUTF(selectedStation);
+           
+            selectedLattitude  =  din.readUTF(); 
+            selectedLongtitude =  din.readUTF(); 
+            selectedWindSpeed  =  din.readUTF(); 
+            selectedTemp       =  din.readUTF(); 
+            selectedWindDirection   =  din.readUTF();
+            
+            clientScreen.areaDownload.setText("Weather Station Id : " +  selectedStation  + "\n" +
+                "(Field) Lattitude    : " +  selectedLattitude  + "\n" +
+                "(Field) Longtitude   : " +  selectedLongtitude + "\n" +
+                "(Field) Wind Speed    : " + selectedWindSpeed  + "\n" +
+                "(Weather) Temperature: " +  selectedTemp       + "\n" +                
+                "(Weather) Humidity   : " +  selectedWindDirection);
+            
+            
+            mode = "";
+            selectedLattitude  =  null; 
+            selectedLongtitude =  null; 
+            selectedWindSpeed   =  null; 
+            selectedTemp       =  null;  
+            selectedWindDirection   =  null;  
+            selectedStation = null; 
+       }
+       catch(IOException e)
+       {
+           
+       }
+       
+       
+   }
    
 }
 
